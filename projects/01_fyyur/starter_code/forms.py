@@ -191,6 +191,7 @@ class ArtistForm(Form):
             ('WY', 'WY'),
         ]
     )
+
     phone = StringField(
         # TODO implement validation logic for state
         'phone'
