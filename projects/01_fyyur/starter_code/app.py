@@ -8,11 +8,13 @@ import json
 import re
 import dateutil.parser
 import babel
+
 from sqlalchemy import func
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql.expression import false
+from wtforms import validators, StringField
 from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
@@ -196,8 +198,10 @@ def create_venue_submission():
   # DONE TODO: modify data to be the data object returned from db insertion
   # on successful db insert, flash success
   error = False
-
+  venue_name = ""
+  
   try:
+    print("TESTING STRINGFIELD WITH VALIDATORS")
     name = request.form['name']
     city = request.form['city']
     state = request.form['state']
@@ -213,25 +217,25 @@ def create_venue_submission():
     venue = Venue(name=name, city=city, state=state, address=address, phone=phone, genres=genres, facebook_link=facebook_link, image_link=image_link, website=website, seeking_talent=seeking_talent, seeking_description=seeking_description)
     db.session.add(venue)
     db.session.commit()
-    
+    venue_name = name
   except:
     error = True
     db.session.rollback()
     print("THERE'S AN ERROR")
-    print(sys.exc_info())
+    print("EXC_INFO:",sys.exc_info())
 
   finally:
     db.session.close()
 
   if not error:
     # flash('Venue ' + request.form['name'] + ' was successfully listed!')
-    flash('Venue: {0} created successfully'.format(venue.name))
+    flash('Venue: {0} created successfully'.format(venue_name))
   # DONE TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   if error:
     # flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
-    flash('An error occurred creating the Venue: {0}. Error: {1}'.format(venue.name, sys.exc_info))
+    flash('An error occurred creating the Venue: {0}. Error: {1}'.format(venue_name, sys.exc_info))
   
   return render_template('pages/home.html')
 
